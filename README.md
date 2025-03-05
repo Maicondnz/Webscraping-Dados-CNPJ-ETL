@@ -9,7 +9,7 @@ O objetivo deste projeto é adquirir os dados abertos referentes ao CNPJ de toda
 ## Arquitetura
 A arquitetura escolhida para este projeto foi baseada na AWS (Amazon Web Services), que proporciona uma solução escalável e eficiente para o processamento e armazenamento dos dados.
 
-![arquitetura](imgs/arquitetura.jpg)
+![arquitetura](imgs/arquittura.jpg)
 
 - **AWS Lambda**: Realiza o acionamento da EC2 para extração dos dados quando é identificado dados novos e aciona o EMR para processar os dados depois de baixados.
 - **EC2**: Realiza a extração dos dados após acionamento pela Lambda.
