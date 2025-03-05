@@ -15,7 +15,7 @@ A arquitetura escolhida para este projeto foi baseada na AWS (Amazon Web Service
 - **EC2**: Realiza a extração dos dados após acionamento pela Lambda.
 - **EMR**: Processa os dados, adiciona a tipagem, cruzamento de tabelas, limpeza e armazena em parquet particionados pela data de processamento.
 - **Amazon EventBridge**: Faz o acionamento das Funções Lambdas. Na primeira ele programa a Lambda para verificar a url do site de 3 em 3 dias. Na segunda ele cria um gatilho de encerramento da EC2 de extração e manda para a Lambda.
-- **Amazon S3**: Utilizado para o armazenamento dos dados brutos extraídos e os dados tratados prontos para consumo.
+- **Amazon S3**: Utilizado para o armazenamento dos dados brutos extraídos na camada 01_Ingestion e os dados tratados prontos para consumo na camada 02_Raw. Além de codigos, logs e tabelas.
 - **AWS Glue Catalog e Crawler**: Utilizado para catalogação dos dados para localização no Athena.
 - **Athena**: Utizado para realizar consultas SQL nos dados parquet e integra-los ao PowerBI.
 - **Power BI**: Ferramenta utilizada para visualização e análise dos dados extraídos, permitindo uma análise interativa e customizada dos CNPJs de todo o Brasil.
@@ -39,7 +39,6 @@ A arquitetura escolhida para este projeto foi baseada na AWS (Amazon Web Service
 - **time**: Manipulação e controle de tempo durante o processamento.
 - **json**: Leitura e gravação de arquivos no formato JSON.
 - **logging**: Registro e monitoramento de logs durante a execução do projeto.
-- **os**: Interação com o sistema operacional para manipulação de arquivos e diretórios.
 - **zipfile**: Manipulação de arquivos ZIP.
 - **io**: Manipulação de entradas e saídas de dados em memória.
 - **concurrent.futures**: Execução paralela de tarefas assíncronas.
