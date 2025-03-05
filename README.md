@@ -47,3 +47,8 @@ A arquitetura escolhida para este projeto foi baseada na AWS (Amazon Web Service
 
 ## PowerBI
 Dashboard Final PowerBI:
+
+![PowerBI](imgs/pagina1.jpg) 
+
+![PowerBI](imgs/pagina2.jpg)
+
