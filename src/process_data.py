@@ -1,18 +1,16 @@
+#Importando Bibliotecas
 from datetime import datetime
 from pyspark.sql.functions import col, sum, round, udf, lpad, translate
 
+#Iniciando Sessão Spark
 spark
 
+#Criando Variável para data de hoje
 data = datetime.now().strftime('%Y%m')
 
+#Funções que serão usadas para limpar os dados
+
 def remover_colunas_nulas(df, limite_percentual=0.8):
-    """
-    Remove colunas com mais de um limite percentual de valores nulos em um DataFrame do Spark.
-    
-    :param df: DataFrame do Spark
-    :param limite_percentual: Percentual limite de valores nulos para remoção (padrão: 70%)
-    :return: DataFrame sem as colunas com muitos valores nulos
-    """
     total_linhas = df.count()  # Contar total de linhas do DataFrame
     limite_nulos = total_linhas * limite_percentual  # Definir o limite de nulos permitido
 
@@ -57,6 +55,8 @@ spark.udf.register("rm_accents",udf_remove_accents)
 udf_remove_specialchars = udf(lambda z: removeSpecialChars(z))
 spark.udf.register("rm_special_chars",udf_remove_specialchars)
 
+# Lendo arquivos
+
 empresas = spark.read.csv('s3://maicon-donza-web-scraping/01_Ingestion/extract_year=2025/extract_month=02/extract_day=27/empresas/',sep=';',header=False,encoding='latin1')
 socios = spark.read.csv('s3://maicon-donza-web-scraping/01_Ingestion/extract_year=2025/extract_month=02/extract_day=27/socios/',sep=';',header=False,encoding='latin1')
 estabelecimentos = spark.read.csv('s3://maicon-donza-web-scraping/01_Ingestion/extract_year=2025/extract_month=02/extract_day=27/estabelecimentos/',sep=';',header=False,encoding='latin1')
@@ -68,6 +68,7 @@ pais = spark.read.csv('s3://maicon-donza-web-scraping/01_Ingestion/extract_year=
 qualificacao = spark.read.csv('s3://maicon-donza-web-scraping/01_Ingestion/extract_year=2025/extract_month=02/extract_day=27/qualificacoes/',sep=';',header=False,encoding='latin1')
 simples = spark.read.csv('s3://maicon-donza-web-scraping/01_Ingestion/extract_year=2025/extract_month=02/extract_day=27/simples/',sep=';',header=False,encoding='latin1')
 
+# Criando Dicionario com o nome das colunas
 columns_empresas =['cnpj_basico','razao_social','natureza_juridica','qualificacao_responsavel','capital_social','porte','ente_fed_responsavel']
 
 columns_socios =['cnpj_basico','tipo_pessoa','nome_razao_social','cpf_cnpj_socio','cod_qualificacao_socio','data_entrada_sociedade',
@@ -92,6 +93,7 @@ columns_qualificacao = ['cod_quali','descricao_quali']
 
 columns_simples = ['cnpj_basico','opcao_simples','data_opcao_simples','data_exclusao_simples','opcao_mei','data_opcao_mei','data_exclusao_mei']
 
+# Colocando as colunas nos dataframes
 df_empresas = empresas.toDF(*columns_empresas)
 df_socios = socios.toDF(*columns_socios)
 df_estabelecimentos = estabelecimentos.toDF(*columns_estabelecimentos)
@@ -103,6 +105,7 @@ df_pais = pais.toDF(*columns_pais)
 df_qualificacao = qualificacao.toDF(*columns_qualificacao)
 df_simples = simples.toDF(*columns_simples)
 
+# Criando as Views
 df_empresas.createOrReplaceTempView('empresas')
 df_socios.createOrReplaceTempView('socios')
 df_estabelecimentos.createOrReplaceTempView('estabelecimentos')
@@ -114,8 +117,9 @@ df_pais.createOrReplaceTempView('pais')
 df_qualificacao.createOrReplaceTempView('qualificacao')
 df_simples.createOrReplaceTempView('simples')
 
-empresa_1 = spark.sql("""
+# Fazendo Join e transformaçoes dos dfs Empresa, naturezas e qualificação
 
+empresa_1 = spark.sql("""
 SELECT
     a.cnpj_basico,
     a.razao_social,
@@ -143,13 +147,14 @@ ON
 """)
 empresa_1.createOrReplaceTempView('empresa_1')
 
-empresa_1.cache()
+# Verificando se teve duplicação
 
 print(empresa_1.count())
 print(empresas.count())
 
-socio_final = spark.sql("""
+# Fazendo Transformações na tabela de socios
 
+socio_final = spark.sql("""
 SELECT
     cnpj_basico,
     CASE
@@ -183,8 +188,9 @@ FROM
     socios
 """)
 
-estabelecimento_1 = spark.sql("""
+# Fazendo Transformações na tabela estabelecimento
 
+estabelecimento_1 = spark.sql("""
 SELECT
     cnpj_basico,
     cnpj_ordem,
@@ -243,7 +249,7 @@ WHERE
 """)
 estabelecimento_1.createOrReplaceTempView('estabelecimento_1')
 
-estabelecimento_1.cache()
+# Fazendo Transformaçoes e Joins finais na tabelas
 
 empresa_etl_1 = spark.sql(f"""
 
@@ -310,11 +316,14 @@ ON
 """)
 empresa_etl_1.createOrReplaceTempView('empresa_etl_1')
 
+#Verificando se teve duplicação
+
 print(empresa_etl_1.count())
 print(estabelecimento_1.count())
 
-df_final = spark.sql(
+# Colocando os tipos das colunas
 
+df_final = spark.sql(
 """
 SELECT
     CAST(cnpj_empresa as string) as cnpj_empresa,
@@ -355,7 +364,7 @@ FROM
 )
 df_final.createOrReplaceTempView('df_final')
 
-df_final.cache()
+#Criando a tabela para consulta dos CNAES
 
 cnae_final = spark.sql(f"""
 SELECT
@@ -367,7 +376,11 @@ FROM
 
 """)
 
+# Removendo colunas com mais de 80% de valores nulos:
+
 df_limpo = remover_colunas_nulas(df_final)
+
+# Armazenando dataframes
 
 df_final.write.partitionBy("data_proc").parquet('s3://maicon-donza-web-scraping/02_Raw/empresas_final',mode='overwrite')
 
