@@ -1,3 +1,4 @@
+#Importando Bibliotecas
 import boto3
 import requests
 from datetime import datetime
@@ -26,9 +27,8 @@ def lambda_handler(event, context):
     else:
         return {"status": "Sem dados novos", "mensagem": f"A URL {url} não foi encontrada."}
 
-
+#Faz requisições à URL com até 10 tentativas em caso de erro
 def verificar_site(url, retries=10):
-    """Faz requisições à URL com até 10 tentativas em caso de erro."""
     for i in range(retries):
         try:
             response = requests.get(url)
@@ -40,9 +40,8 @@ def verificar_site(url, retries=10):
         sleep(2)
     return False
 
-
+#Verifica se os arquivos do mês já estão no S3
 def verificar_arquivos_s3(year, month):
-    """ Verifica se os arquivos do mês já estão no S3 """
     s3 = boto3.client("s3")
     prefix = S3_PREFIX.format(year, month)  # Caminho dos arquivos no S3
 
@@ -55,9 +54,8 @@ def verificar_arquivos_s3(year, month):
     
     return False  # Se não encontrou arquivos, retorna False
 
-
+#Inicia uma instância EC2
 def iniciar_ec2(instance_id):
-    """ Inicia uma instância EC2 """
     ec2 = boto3.client("ec2", region_name=AWS_REGION)
 
     try:
