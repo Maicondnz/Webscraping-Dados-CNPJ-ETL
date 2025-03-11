@@ -1,8 +1,9 @@
+# Importanto bibliotecas
 import json
 import boto3
 import time
 
-
+# Definindo Variaveis
 REGION = "us-east-1"
 EMR_RELEASE = "emr-7.1.0"
 INSTANCE_TYPE = "m5.xlarge"
@@ -12,21 +13,21 @@ S3_SCRIPT_PATH = "s3://maicon-donza-web-scraping/03_codigos/process_data.py"
 ROLE_EMR_EC2 = "EMR_EC2_DefaultRole"
 ROLE_EMR_SERVICE = "EMR_DefaultRole"
 
+#Retorna um cliente para o EMR
 def get_emr_client():
-    """Retorna um cliente para o EMR"""
     return boto3.client("emr", region_name=REGION)
-
+    
+#Verifica se há um cluster EMR em execução
 def get_active_cluster():
-    """Verifica se há um cluster EMR em execução"""
     emr_client = get_emr_client()
     response = emr_client.list_clusters(ClusterStates=["STARTING", "BOOTSTRAPPING", "RUNNING", "WAITING"])
     
     if response["Clusters"]:
         return response["Clusters"][0]["Id"]  # Retorna o primeiro cluster ativo encontrado
     return None
-
+    
+#Cria um cluster EMR se não houver um ativo
 def start_emr_cluster():
-    """Cria um cluster EMR se não houver um ativo"""
     active_cluster = get_active_cluster()
     
     if active_cluster:
@@ -67,8 +68,8 @@ def start_emr_cluster():
     print(f"Cluster criado: {cluster_id}")
     return cluster_id
 
+#Adiciona um Step Job ao cluster se ele ainda não existir
 def add_step_to_cluster(cluster_id):
-    """Adiciona um Step Job ao cluster se ele ainda não existir"""
     emr_client = get_emr_client()
     
     # Verifica Steps existentes para evitar duplicação
@@ -97,8 +98,8 @@ def add_step_to_cluster(cluster_id):
     print(f"Step adicionado: {step_id}")
     return step_id
 
+#Aguarda a execução do Step Job
 def wait_for_step_completion(cluster_id, step_id):
-    """Aguarda a execução do Step Job"""
     emr_client = get_emr_client()
     
     while True:
@@ -113,14 +114,14 @@ def wait_for_step_completion(cluster_id, step_id):
 
     return step_state
 
+#Finaliza o cluster EMR
 def terminate_cluster(cluster_id):
-    """Finaliza o cluster EMR"""
     emr_client = get_emr_client()
     emr_client.terminate_job_flows(JobFlowIds=[cluster_id])
     print(f"Cluster {cluster_id} finalizado.")
 
+#Função Lambda acionada pelo encerramento do EC2
 def lambda_handler(event, context):
-    """Função Lambda acionada pelo encerramento do EC2"""
     print("Evento recebido:", json.dumps(event))
     
     cluster_id = start_emr_cluster()
