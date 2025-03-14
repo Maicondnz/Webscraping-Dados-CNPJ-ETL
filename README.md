@@ -35,7 +35,7 @@ A arquitetura escolhida para este projeto foi baseada na AWS (Amazon Web Service
 ## Funcionalidades
 
 - **Extração de Dados**: Coleta os dados abertos do Cadastro Nacional da Pessoa Jurídica (CNPJ) via API pública.
-- **Transformação**: Após a extração, os dados passam por um processo de limpeza, transformação e normalização para garantir que estejam estruturados corretamente para consumo.
+- **Transformação**: Após a extração, os dados passam por um processo de limpeza, transformação e desnormalização para garantir que estejam estruturados corretamente para consumo.
 - **Carga**: Os dados tratados são armazenados no Amazon S3 e disponibilizados para consumo via Power BI.
 - **Visualização**: O Power BI é usado para criar dashboards interativos e informativos, com gráficos e tabelas que ajudam na análise e visualização dos dados.
 
