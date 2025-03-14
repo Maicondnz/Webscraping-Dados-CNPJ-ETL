@@ -1,10 +1,20 @@
 # Projeto de Extração de Dados - Cadastro Nacional da Pessoa Jurídica (CNPJ)
 
 ## Introdução
-Este projeto visa a extração e utilização dos dados abertos do Cadastro Nacional da Pessoa Jurídica (CNPJ) disponibilizados no portal [dados.gov.br](https://dados.gov.br/dados/conjuntos-dados/cadastro-nacional-da-pessoa-juridica---cnpj) que são atualizados mensalmente.
+O site [dados.gov.br](https://dados.gov.br/dados/conjuntos-dados/cadastro-nacional-da-pessoa-juridica---cnpj) disponibiliza dados abertos sobre os CNPJs do Brasil, abrangendo tanto empresas ativas quanto inativas. As informações são atualizadas mensalmente e estão disponíveis no formato ZIP, divididas em vários arquivos por categoria:
+- Empresas
+- Motivos
+- Municípios
+- Países
+- Qualificações dos Sócios
+- Naturezas Jurídicas
+- Simples Nacional
+- Sócios
+
+Além disso, o portal fornece um [dicionário](https://www.gov.br/receitafederal/dados/cnpj-metadados.pdf) de metadados que explica as classificações presentes nas colunas, facilitando a compreensão e manipulação dos dados.
 
 ## Objetivo
-O objetivo deste projeto é adquirir os dados abertos referentes ao CNPJ de todas as empresas registradas no Brasil, tratá-los e organizá-los, deixando-os prontos para análises e visualizações de forma sempre atualizada. A solução abrange desde a extração dos dados da API pública até a preparação das informações para fácil acesso e exploração no Power BI.
+O objetivo deste projeto é adquirir os dados abertos referentes ao CNPJ de todas as empresas registradas no Brasil, tratá-los e organizá-los, deixando-os prontos para análises e visualizações da forma mais simples e atualizada possível. A solução abrange desde a extração dos dados da API pública até a preparação das informações para fácil acesso e exploração no Power BI, além da atualização automática.
 
 ## Arquitetura
 A arquitetura escolhida para este projeto foi baseada na AWS (Amazon Web Services), que proporciona uma solução escalável e eficiente para o processamento e armazenamento dos dados.
